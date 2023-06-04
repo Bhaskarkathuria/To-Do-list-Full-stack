@@ -11,7 +11,7 @@ router.post('/',(req,res,next)=>{
 
     })
     .then(result=>{
-        res.sendStatus(200).send('task added to database')
+        res.send('task added to database')
     })
     .catch(error=>{
         console.log(error)
@@ -38,21 +38,28 @@ router.get('/:id',(req,res,next)=>{
     })
 })
 
-router.delete('/:id',(req,res,next)=>{
-    const taskid=req.params.id;
-    Task.findByPk(taskid)
-    .then(product=>{
-       return product.destroy()
-       .then(res=>{
-        console.log('task destroyed')
-        
-       })
-       .catch(err=>{
-        console.log(err)
-       })
+router.delete('/:id', (req, res, next) => {
+  const taskId = req.params.id;
+  Task.findByPk(taskId)
+    .then(product => {
+      if (product) {
+        return product.destroy()
+          .then(() => {
+            console.log('Task destroyed');
+            res.sendStatus(200);
+          })
+          .catch(err => {
+            console.log(err);
+            res.status(500).send('An error occurred');
+          });
+      } else {
+        res.status(404).send('Task not found');
+      }
     })
-    .catch()
-})
-
+    .catch(error => {
+      console.log(error);
+      res.status(500).send('An error occurred');
+    });
+});
 
 module.exports=router;
